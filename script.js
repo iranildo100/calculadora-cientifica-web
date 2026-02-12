@@ -1,3 +1,10 @@
+/* ===== CAPTURAR ELEMENTOS DO HTML ===== */
+const display = document.getElementById("display");
+const historico = document.getElementById("historico");
+const cientifica = document.getElementById("cientifica");
+const menuDropdown = document.getElementById("menuDropdown");
+const modoAnguloBtn = document.getElementById("modoAngulo");
+
 let modo = "padrao";
 let modoAngulo = "DEG";
 let ANS = 0;
@@ -27,6 +34,7 @@ function btn(v){
 
 function limparTela(){ display.value="0"; }
 function limparTudo(){ display.value="0"; historico.innerHTML=""; }
+
 function backspace(){
     display.value = display.value.length>1 ? display.value.slice(0,-1) : "0";
 }
@@ -161,23 +169,13 @@ function avaliarRPN(rpn){
     let s=[];
     rpn.forEach(t=>{
         if(typeof t==="number") s.push(t);
-
-        else if(t==="!"){
-            let v=s.pop();
-            if(v<0) throw "Fatorial de número negativo";
-            s.push(factorial(v));
-        }
-
+        else if(t==="!") s.push(factorial(s.pop()));
         else if(t in OPERADORES){
             let b=s.pop(), a=s.pop();
             if(t==="/" && b===0) throw "Divisão por zero";
             s.push(OPERADORES[t].fn(a,b));
         }
-
-        else if(t in FUNCOES){
-            let v=s.pop();
-            s.push(FUNCOES[t](v));
-        }
+        else if(t in FUNCOES) s.push(FUNCOES[t](s.pop()));
     });
 
     if(s.length!==1) throw "Expressão inválida";
@@ -188,7 +186,6 @@ function avaliarSeguro(expr){
     return avaliarRPN(paraRPN(tokenizar(expr)));
 }
 
-/* ================= FORMATAR RESULTADO ================= */
 function formatarResultado(v){
     if(typeof v === "number"){
         return Number.isInteger(v) ? v : Number(v.toFixed(6));
@@ -196,7 +193,6 @@ function formatarResultado(v){
     return v;
 }
 
-/* ================= HISTÓRICO ================= */
 function mostrarHistorico(expr, resultado){
     const linha = document.createElement("div");
     linha.textContent = expr + " = " + resultado;
@@ -204,7 +200,6 @@ function mostrarHistorico(expr, resultado){
     historico.prepend(linha);
 }
 
-/* ================= CALCULAR ================= */
 function calcular(){
     let exprOriginal = display.value.trim();
 
@@ -222,23 +217,3 @@ function calcular(){
         alert(err || "Erro na expressão");
     }
 }
-
-/* ================= TECLADO ================= */
-document.addEventListener("keydown", e => {
-
-    if(e.key==="Enter"){ e.preventDefault(); calcular(); return; }
-    if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
-
-    if(e.key==="," || e.key==="."){ btn("."); return; }
-
-    if(/^[a-zA-Z]$/.test(e.key)){
-        btn(e.key.toLowerCase());
-        return;
-    }
-
-    const permitidos="0123456789+-*/()%^!";
-    if(permitidos.includes(e.key)) btn(e.key);
-});
-
-document.addEventListener("click", e => {
-    if(!e.target.closest
