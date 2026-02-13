@@ -217,3 +217,29 @@ function calcular(){
         alert(err || "Erro na expressão");
     }
 }
+
+/* ================= TECLADO ================= */
+document.addEventListener("keydown", e => {
+
+    if(e.key==="Enter"){ e.preventDefault(); calcular(); return; }
+    if(e.key==="Backspace"){ e.preventDefault(); backspace(); return; }
+
+    if(e.key==="," || e.key==="."){ btn("."); return; }
+
+    if(/^[a-zA-Z]$/.test(e.key)){
+        btn(e.key.toLowerCase());
+        return;
+    }
+
+    const permitidos="0123456789+-*/()%^!";
+    if(permitidos.includes(e.key)) btn(e.key);
+});
+
+
+/* ================= FECHAR MENU AO CLICAR FORA ================= */
+document.addEventListener("click", e => {
+    if(!e.target.closest(".menu-icon") && !e.target.closest("#menuDropdown")){
+        menuDropdown.style.display = "none";
+    }
+});
+
